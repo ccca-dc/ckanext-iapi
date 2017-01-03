@@ -4,18 +4,24 @@ ckanext-iapi
 
 This extension adds an Action API function:
 
-##### resource_change_package
+##### resource_change_package(context, data_dict)
 Function to move a resource to a different package. You need to be
 authorized to edit both packages.
+
+Parameters:
+
+- resource_id (string) – id of the resource that should be moved
+- new_package_id (string) – id of the dataset to which the resource should be moved
+
+Usage:
+
+    curl -X POST http://127.0.0.1:5000/api/3/action/resource_change_package -H "Authorization: {YOUR-API-KEY}" -d '{"resource_id": "{RESOURCE-ID}", "new_package_id": "{PACKAGE-ID}"}'
+
 
 
 ------------
 Installation
 ------------
-
-.. Add any additional install steps to the list below.
-   For example installing any non-Python dependencies or adding any required
-   config settings.
 
 To install ckanext-iapi:
 
