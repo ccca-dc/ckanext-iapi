@@ -66,7 +66,10 @@ def resource_get_size(context, data_dict):
     resource_id = _get_or_bust(data_dict, 'id')
 
     _check_access('resource_update', context, data_dict)
-    _check_access('resource_show', context, data_dict)
     resource_dict = _get_action('resource_show')(context, {'id': resource_id})
-    upload = uploader.get_resource_uploader(resource_dict)
-    os.path.getsize(upload.get_path(resource_id))
+    if 'upload' in _get_or_bust(data_dict, 'url_type'):
+        upload = uploader.get_resource_uploader(resource_dict)
+        file_size = os.path.getsize(upload.get_path(resource_id))
+        return file_size
+    else:
+        return None
