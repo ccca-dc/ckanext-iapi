@@ -2,7 +2,12 @@
 
 import ckan.logic
 import ckan.plugins as plugins
+import ckan.plugins.toolkit as tk
 from ckan.logic import side_effect_free
+
+import os
+import ckan.lib.uploader as uploader
+
 ValidationError = ckan.logic.ValidationError
 NotFound = ckan.logic.NotFound
 _check_access = ckan.logic.check_access
@@ -53,3 +58,15 @@ def resource_change_package(context, data_dict):
     _get_action('package_update')(context, pkg_dict_new)
 
     return "package '" + package_id_new + "' contains now " + str(len(pkg_dict_new['resources'])) + " resource(s)"
+
+def resource_get_size(context, data_dict):
+    model = context['model']
+    user = context['user']
+
+    resource_id = _get_or_bust(data_dict, 'id')
+
+    _check_access('resource_update', context, data_dict)
+    _check_access('resource_show', context, data_dict)
+    resource_dict = _get_action('resource_show')(context, {'id': resource_id})
+    upload = uploader.get_resource_uploader(resource_dict)
+    os.path.getsize(upload.get_path(resource_id))
