@@ -17,5 +17,5 @@ class IapiPlugin(plugins.SingletonPlugin):
     def get_actions(self):
         actions = {'resource_change_package': action.resource_change_package,
                    'resource_get_size': action.resource_get_size,
-                   'resource_get_hash': action.resource_get_size}
+                   'resource_get_hash': action.resource_get_hash}
         return actions

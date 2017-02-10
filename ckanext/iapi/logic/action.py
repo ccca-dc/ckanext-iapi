@@ -68,7 +68,7 @@ def resource_get_size(context, data_dict):
 
     _check_access('resource_update', context, data_dict)
     resource_dict = _get_action('resource_show')(context, {'id': resource_id})
-    if _get_or_bust(data_dict, 'url_type'):
+    if _get_or_bust(resource_dict, 'url_type'):
         upload = uploader.get_resource_uploader(resource_dict)
         file_size = os.path.getsize(upload.get_path(resource_id))
         return file_size
@@ -86,7 +86,7 @@ def resource_get_hash(context, data_dict):
     _check_access('resource_update', context, data_dict)
     resource_dict = _get_action('resource_show')(context, {'id': resource_id})
     # FIXME check if url_type is upload
-    if _get_or_bust(data_dict, 'url_type'):
+    if _get_or_bust(resource_dict, 'url_type'):
         upload = uploader.get_resource_uploader(resource_dict)
         file_path = upload.get_path(resource_id)
         with open(file_path, 'rb') as afile:
