@@ -89,9 +89,11 @@ def resource_get_hash(context, data_dict):
     if _get_or_bust(resource_dict, 'url_type'):
         upload = uploader.get_resource_uploader(resource_dict)
         file_path = upload.get_path(resource_id)
+
+        # FIXME do it in chunks!!!
         with open(file_path, 'rb') as afile:
-            buf = afile.read()
-            hasher.update(buf)
+            for chunk in iter(lambda: f.read(128*hasher.block_size), b''): 
+                hasher.update(chunk)
         return hasher.hexdigest()
     else:
         raise ValidationError({'order':'This is not an uploaded file'})
