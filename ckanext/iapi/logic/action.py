@@ -91,8 +91,8 @@ def resource_get_hash(context, data_dict):
         file_path = upload.get_path(resource_id)
 
         # FIXME do it in chunks!!!
-        with open(file_path, 'rb') as afile:
-            for chunk in iter(lambda: f.read(128*hasher.block_size), b''): 
+        with open(file_path, 'rb') as f:
+            for chunk in iter(lambda: f.read(128*hasher.block_size), b''):
                 hasher.update(chunk)
         return hasher.hexdigest()
     else:
