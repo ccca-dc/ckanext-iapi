@@ -2,7 +2,13 @@
 
 import ckan.logic
 import ckan.plugins as plugins
+import ckan.plugins.toolkit as tk
 from ckan.logic import side_effect_free
+
+import os
+import hashlib
+import ckan.lib.uploader as uploader
+
 ValidationError = ckan.logic.ValidationError
 NotFound = ckan.logic.NotFound
 _check_access = ckan.logic.check_access
@@ -53,3 +59,40 @@ def resource_change_package(context, data_dict):
     _get_action('package_update')(context, pkg_dict_new)
 
     return "package '" + package_id_new + "' contains now " + str(len(pkg_dict_new['resources'])) + " resource(s)"
+
+def resource_get_size(context, data_dict):
+    model = context['model']
+    user = context['user']
+
+    resource_id = _get_or_bust(data_dict, 'id')
+
+    _check_access('resource_update', context, data_dict)
+    resource_dict = _get_action('resource_show')(context, {'id': resource_id})
+    if _get_or_bust(resource_dict, 'url_type'):
+        upload = uploader.get_resource_uploader(resource_dict)
+        file_size = os.path.getsize(upload.get_path(resource_id))
+        return file_size
+    else:
+        raise ValidationError({'order':'This is not an uploaded file'})
+
+
+def resource_get_hash(context, data_dict):
+    model = context['model']
+    user = context['user']
+
+    hasher = hashlib.md5()
+    resource_id = _get_or_bust(data_dict, 'id')
+
+    _check_access('resource_update', context, data_dict)
+    resource_dict = _get_action('resource_show')(context, {'id': resource_id})
+    # FIXME check if url_type is upload
+    if _get_or_bust(resource_dict, 'url_type'):
+        upload = uploader.get_resource_uploader(resource_dict)
+        file_path = upload.get_path(resource_id)
+
+        with open(file_path, 'rb') as f:
+            for chunk in iter(lambda: f.read(128*hasher.block_size), b''):
+                hasher.update(chunk)
+        return hasher.hexdigest()
+    else:
+        raise ValidationError({'order':'This is not an uploaded file'})
