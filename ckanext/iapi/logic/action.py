@@ -16,6 +16,26 @@ _get_or_bust = ckan.logic.get_or_bust
 _get_action = ckan.logic.get_action
 
 
+import re
+from ckanext.resourceversions import helpers as hr
+# FIXME: Check if resourceversions is loaded
+
+
+def package_show (context, data_dict):
+    
+    # id kann key oder name sein; name braucht -vxx
+    id = data_dict['id']
+    r1 = re.compile("-v..$")
+    if not r1.search(id):
+            #Look for newest version: returns error if we tried with a key
+            ipkg = hr.get_newest_version(id + '-v01')
+            if ipkg:
+                data_dict['id'] = ipkg['name']
+
+    pkg = ckan.logic.action.get.package_show(context, data_dict)
+
+    return pkg
+
 def resource_change_package(context, data_dict):
     model = context['model']
     resource_id = data_dict.pop('resource_id', None)
