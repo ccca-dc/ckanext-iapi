@@ -73,7 +73,10 @@ def resource_change_package(context, data_dict):
 
     pkg_dict_new = _get_action('package_show')(context, {'id': package_id_new})
 
+    resource_dict['url'] = resource.url
+
     # append resource to new package
+    resource_dict['package_id'] = pkg_dict_new['id']
     pkg_dict_new['resources'].append(resource_dict)
 
     _get_action('package_update')(context, pkg_dict_new)
