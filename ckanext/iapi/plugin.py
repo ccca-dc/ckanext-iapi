@@ -18,5 +18,6 @@ class IapiPlugin(plugins.SingletonPlugin):
         actions = {'resource_change_package': action.resource_change_package,
                    'resource_get_size': action.resource_get_size,
                    'resource_get_hash': action.resource_get_hash,
-                   'package_show': action.package_show}
+                   'package_show': action.package_show,
+                   'group_list_authz': action.group_list_authz}
         return actions
