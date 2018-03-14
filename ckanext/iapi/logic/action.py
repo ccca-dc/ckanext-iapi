@@ -256,6 +256,8 @@ def organization_list_for_other_user(context, data_dict):
             .filter(model.Member.table_name == 'user') \
             .filter(model.Member.table_id == user_id) \
             .filter(model.Member.state == 'active') \
+            .filter(model.Group.is_organization == True) \
+            .filter(model.Group.state == 'active') \
             .join(model.Group)
 
         # roles_that_cascade = \
