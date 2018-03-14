@@ -19,5 +19,6 @@ class IapiPlugin(plugins.SingletonPlugin):
                    'resource_get_size': action.resource_get_size,
                    'resource_get_hash': action.resource_get_hash,
                    'package_show': action.package_show,
-                   'group_list_authz': action.group_list_authz}
+                   'group_list_authz': action.group_list_authz,
+                   'organization_list_for_other_user': action.organization_list_for_other_user}
         return actions
