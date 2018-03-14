@@ -267,7 +267,7 @@ def organization_list_for_other_user(context, data_dict):
             #         in group.get_children_group_hierarchy(type='organization')
             #         ])
             # group_ids.add(group.id)
-            org = tk.get_action('organization_show')(context, {'id': group.id, 'state': 'active'})
+            org = tk.get_action('organization_show')(context, {'id': group.id, 'state': 'active', 'include_users': False, 'include_groups': False, 'include_extras': False, 'include_tags': False, 'include_followers': False})
             return_list.append({'organization': org, 'role': member.capacity})
 
     return return_list
