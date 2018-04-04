@@ -25,7 +25,7 @@ import re
 from ckanext.resourceversions import helpers as hr
 # FIXME: Check if resourceversions is loaded
 
-
+@side_effect_free
 def package_show (context, data_dict):
 
     # id kann key oder name sein; name braucht -vxx
@@ -91,6 +91,7 @@ def resource_change_package(context, data_dict):
 
     return "package '" + package_id_new + "' contains now " + str(len(pkg_dict_new['resources'])) + " resource(s)"
 
+@side_effect_free
 def resource_get_size(context, data_dict):
     model = context['model']
     user = context['user']
@@ -106,7 +107,7 @@ def resource_get_size(context, data_dict):
     else:
         raise ValidationError({'order':'This is not an uploaded file'})
 
-
+@side_effect_free
 def resource_get_hash(context, data_dict):
     model = context['model']
     user = context['user']
