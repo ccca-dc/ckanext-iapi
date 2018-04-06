@@ -12,6 +12,8 @@ import ckan.authz as authz
 import ckan.lib.dictization.model_dictize as model_dictize
 from paste.deploy.converters import asbool
 from ckan.lib.base import _
+import ckan.logic as logic
+import sqlalchemy
 
 ValidationError = ckan.logic.ValidationError
 NotFound = ckan.logic.NotFound
@@ -19,6 +21,9 @@ NotAuthorized = ckan.logic.NotAuthorized
 _check_access = ckan.logic.check_access
 _get_or_bust = ckan.logic.get_or_bust
 _get_action = ckan.logic.get_action
+
+_select = sqlalchemy.sql.select
+_and_ = sqlalchemy.and_
 
 
 import re
@@ -274,3 +279,56 @@ def organization_list_for_other_user(context, data_dict):
             return_list.append({'organization': org, 'role': member.capacity})
 
     return return_list
+
+
+@logic.validate(logic.schema.default_pagination_schema)
+def package_list(context, data_dict):
+    '''Return a list of the names of the site's datasets (packages).
+
+    :param limit: if given, the list of datasets will be broken into pages of
+        at most ``limit`` datasets per page and only one page will be returned
+        at a time (optional)
+    :type limit: int
+    :param offset: when ``limit`` is given, the offset to start
+        returning packages from
+    :type offset: int
+
+    :rtype: list of strings
+
+    '''
+    model = context["model"]
+    api = context.get("api_version", 1)
+
+    _check_access('package_list', context, data_dict)
+
+    package_table = model.package_table
+    col = (package_table.c.id
+           if api == 2 else package_table.c.name)
+    query = _select([col])
+    query = query.where(_and_(
+        package_table.c.state == 'active',
+        package_table.c.private == False,
+    ))
+    query = query.order_by(col)
+
+    limit = data_dict.get('limit')
+    if limit:
+        query = query.limit(limit)
+
+    offset = data_dict.get('offset')
+    if offset:
+        query = query.offset(offset)
+
+    pkg_name_list = [r[0] for r in query.execute()]
+
+    # added this section for 'include_versions' parameter
+    if '__extras' not in data_dict or data_dict['__extras'].get('include_versions', False) is False:
+        # remove -v from all names
+        pkg_name_list = ["-v".join(element.split("-v")[:-1]) for element in pkg_name_list]
+
+        # make elements of list unique
+        pkg_name_list = list(set(pkg_name_list))
+
+
+    ## Returns the first field in each result record
+    return pkg_name_list
