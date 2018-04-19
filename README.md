@@ -18,32 +18,11 @@ Usage:
     curl -X POST http://127.0.0.1:5000/api/3/action/resource_change_package -H "Authorization: {YOUR-API-KEY}" -d '{"resource_id": "{RESOURCE-ID}", "new_package_id": "{PACKAGE-ID}"}'
 
 
-##### resource_get_size(context, data_dict)
-Function to get the size of an uploaded resource. You need to be
-authorized to update the resource.
+##### package_list(context, data_dict)
 
-Parameters:
+Additional parameters:
 
-- id (string) – id of the resource
-
-Usage:
-
-    curl -X POST http://127.0.0.1:5000/api/3/action/resource_get_size -H "Authorization: {YOUR-API-KEY}" -d '{"id": "{RESOURCE-ID}"}'
-
-
-##### resource_get_hash(context, data_dict)
-Function to get the MD5 hashsum of an uploaded resource. You need to be
-authorized to update the resource.
-
-Parameters:
-
-- id (string) – id of the resource
-
-Usage:
-
-    curl -X POST http://127.0.0.1:5000/api/3/action/resource_get_hash -H "Authorization: {YOUR-API-KEY}" -d '{"id": "{RESOURCE-ID}"}'
-
-
+- include_versions (bool) – True if all versions should be displayed. Default: False
 
 ------------
 Installation
