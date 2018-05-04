@@ -48,16 +48,22 @@ class IapiPlugin(plugins.SingletonPlugin):
 def hash_and_size_create_job(user, resource):
     context = {'model': model, 'session': model.Session, 'user': user}
 
-    try:
-        res_size = toolkit.get_action('resource_get_size')(context, {'id': resource['id']})
-        res_hash = toolkit.get_action('resource_get_hash')(context, {'id': resource['id']})
-        resource['hash_algorithm'] = 'md5'
-    except ValidationError:
-        res_size = ''
-        res_hash = ''
-        resource['hash_algorithm'] = ''
+    # check if resource is subset as these cannot check hash and size this way
+    package = toolkit.get_action('package_show')(context, {'id': resource['package_id']})
+    parent_ids = [element['id'] for element in package['relations'] if element['relation'] == 'is_part_of']
 
-    if res_size != resource['size'] and res_hash != resource['hash']:
-        resource['size'] = res_size
-        resource['hash'] = res_hash
-        toolkit.get_action('resource_update')(context, resource)
+    if len(parent_ids) == 0:
+        orig_size = resource['size']
+        orig_hash = resource['hash']
+
+        try:
+            resource['size'] = toolkit.get_action('resource_get_size')(context, {'id': resource['id']})
+            resource['hash'] = toolkit.get_action('resource_get_hash')(context, {'id': resource['id']})
+            resource['hash_algorithm'] = 'md5'
+        except ValidationError:
+            resource['size'] = ''
+            resource['hash'] = ''
+            resource['hash_algorithm'] = ''
+
+        if orig_size != resource['size'] and orig_hash != resource['hash']:
+            toolkit.get_action('resource_update')(context, resource)
