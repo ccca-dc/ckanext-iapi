@@ -53,17 +53,22 @@ def hash_and_size_create_job(user, resource):
     parent_ids = [element['id'] for element in package['relations'] if element['relation'] == 'is_part_of']
 
     if len(parent_ids) == 0:
-        orig_size = resource['size']
+        orig_size = resource.get('size', None)
         orig_hash = resource['hash']
 
         try:
-            resource['size'] = toolkit.get_action('resource_get_size')(context, {'id': resource['id']})
+            resource['size'] = str(toolkit.get_action('resource_get_size')(context, {'id': resource['id']}))
+            new_size = resource['size']
             resource['hash'] = toolkit.get_action('resource_get_hash')(context, {'id': resource['id']})
             resource['hash_algorithm'] = 'md5'
         except ValidationError:
             resource['size'] = ''
+            # size needs to be saved as empty string however returns None in package_show
+            # therefore new_size is needed for comparison
+            new_size = None
             resource['hash'] = ''
             resource['hash_algorithm'] = ''
 
-        if orig_size != resource['size'] and orig_hash != resource['hash']:
+        if orig_size != new_size or orig_hash != resource['hash']:
+            context['create_version'] = False
             toolkit.get_action('resource_update')(context, resource)
