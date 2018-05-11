@@ -46,7 +46,7 @@ class IapiPlugin(plugins.SingletonPlugin):
 
 
 def hash_and_size_create_job(user, resource):
-    context = {'model': model, 'session': model.Session, 'user': user}
+    context = {'model': model, 'user': user}
 
     # check if resource is subset as these cannot check hash and size this way
     package = toolkit.get_action('package_show')(context, {'id': resource['package_id']})
@@ -70,5 +70,6 @@ def hash_and_size_create_job(user, resource):
             resource['hash_algorithm'] = ''
 
         if orig_size != new_size or orig_hash != resource['hash']:
+            # for before_update in resourceversions
             context['create_version'] = False
             toolkit.get_action('resource_update')(context, resource)
