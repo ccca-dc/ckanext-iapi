@@ -70,6 +70,10 @@ def hash_and_size_create_job(user, resource):
             resource['hash_algorithm'] = ''
 
         if orig_size != new_size or orig_hash != resource['hash']:
+            # need to pop package and resource otherwise state of package set to draft
+            context.pop('package')
+            context.pop('resource')
+
             # for before_update in resourceversions
             context['create_version'] = False
             toolkit.get_action('resource_update')(context, resource)
