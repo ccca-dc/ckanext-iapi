@@ -74,6 +74,10 @@ def hash_and_size_create_job(user, resource):
             context.pop('package')
             context.pop('resource')
 
+            #Make sure that the orginal dataset is ready and we do not run into a draft problemn; 22.5.2018 - Anja
+            import time
+            time.sleep(5)
+
             # for before_update in resourceversions
             context['create_version'] = False
             toolkit.get_action('resource_update')(context, resource)
